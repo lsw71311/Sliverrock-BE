@@ -49,6 +49,9 @@ dependencies {
 	//hibernate-spaitial 의존성
 	implementation("org.hibernate:hibernate-spatial:5.6.15.Final")
 
+	// redis 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// sms
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 

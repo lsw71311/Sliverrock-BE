@@ -2,6 +2,7 @@ package com.example.silverrock.sms;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,8 +26,11 @@ import java.util.List;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class SmsService {
+
+    private final RedisUtil redisUtil;
 
     @Value("${sms.serviceId}")
     private String serviceId;
@@ -96,8 +100,7 @@ public class SmsService {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         //restTemplate로 post 요청 보내고 오류가 없으면 202코드 반환
         SmsRes smsResponseDto = restTemplate.postForObject(new URI("https://sens.apigw.ntruss.com/sms/v2/services/"+ serviceId +"/messages"), httpBody, SmsRes.class);
-     //   SmsRes responseDto = new SmsRes(smsConfirmNum);
-        // redisUtil.setDataExpire(smsConfirmNum, messageDto.getTo(), 60 * 3L); // 유효시간 3분
+        redisUtil.setDataExpire(smsConfirmNum, messageDto.getTo(), 60 * 3L); // 유효시간 3분
         return smsResponseDto;
     }
 
@@ -112,5 +115,15 @@ public class SmsService {
             key.append((rnd.nextInt(10)));
         }
         return key.toString();
+    }
+
+    // 인증번호 검증
+    public boolean verifyEmail(String key) {
+        String memberEmail = redisUtil.getData(key);
+        if (memberEmail == null) {
+            return false;
+        }
+        redisUtil.deleteData(key);
+        return true;
     }
 }
