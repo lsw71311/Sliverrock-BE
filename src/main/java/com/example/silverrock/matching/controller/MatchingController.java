@@ -2,7 +2,6 @@ package com.example.silverrock.matching.controller;
 
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
-import com.example.silverrock.matching.repository.MatchingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
