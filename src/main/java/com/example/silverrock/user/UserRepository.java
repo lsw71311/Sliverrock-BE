@@ -22,5 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 */
     boolean existsByNickname(String nickName);
 
-    List<User> findByRegion(String region);
+    List<User> findByRegionAndIdNot(String region, Long userId);
 }
