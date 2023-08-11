@@ -12,5 +12,4 @@ import javax.persistence.Column;
 public class PostMatcingReq {
     private Long sender; // 매칭 요청 발신자
     private Long receiver;
-
 }

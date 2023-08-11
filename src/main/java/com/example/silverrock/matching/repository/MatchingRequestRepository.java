@@ -1,5 +1,4 @@
-package com.example.silverrock.matching.repository;//package com.example.silverrock.matching.repository;
-
+package com.example.silverrock.matching.repository;
 import com.example.silverrock.matching.Entity.Matching;
 import com.example.silverrock.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

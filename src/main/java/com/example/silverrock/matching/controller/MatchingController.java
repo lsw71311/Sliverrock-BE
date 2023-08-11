@@ -17,20 +17,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MatchingController {
 
     @Autowired
-    private final MatchingRequestRepository matchingRequestRepository;
     private final MatchingService matchingService;
 
-    private AtomicLong matchingIdGenerator = new AtomicLong(1); //매칭아이디 자동 생성 변수
+//    private AtomicLong matchingIdGenerator = new AtomicLong(1); //매칭아이디 자동 생성 변수
 
     //매칭 요청
     @PostMapping("/{receiver}")
     public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq postMatcingReq) {
         Long matchingId = matchingService.matchingRequest(postMatcingReq,receiver);
-//        return new BaseResponse<>(matchingService.matchingRequest(matchingId,postMatcingReq));
         return new BaseResponse<>(matchingId);
     }
 
-    //매칭 수락
     // 매칭 수락
     @PostMapping("/accept/{matching_id}")
     public BaseResponse acceptMatching(@PathVariable("matching_id") Long matchingId) {

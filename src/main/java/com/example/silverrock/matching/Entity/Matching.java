@@ -32,7 +32,5 @@ public class Matching extends BaseTimeEntity {
         this.receiver = receiver;
         this.success=success;
     }
-
-
 }
 
