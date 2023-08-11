@@ -17,7 +17,7 @@ public class MatchingService {
     private final MatchingRepository matchingRepository;
 
     //매칭 요청 matchingRequest
-    public void matchingRequest(PostMatcingReq postMatcingReq){
+    public void matchingRequest(PostMatcingReq postMatcingReq, Long matchingId){
         Matching matching =new Matching(
                 postMatcingReq.getSender(), postMatcingReq.getReceiver(), false
                 //요청 수신자와 발신자 고유번호를 받아옴. 성공여부는 false기본값으로 저장
