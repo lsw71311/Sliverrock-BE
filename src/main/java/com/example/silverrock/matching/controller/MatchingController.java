@@ -2,9 +2,11 @@ package com.example.silverrock.matching.controller;//package com.example.silverr
 
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
+import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
+import com.example.silverrock.user.dto.GetUserRes;
 import com.example.silverrock.user.profile.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MatchingController {
 
     private final MatchingService matchingService;
+    private final JwtService jwtService;
 //    @Autowired
 //    private MatchingRequestRepository matchingRequestRepository;
 //    private AtomicLong matchingIdGenerator = new AtomicLong(1);
@@ -66,10 +69,11 @@ public class MatchingController {
 
     //내가 받은 매칭 요청 조회(요청자의 프로필 전체 조회)
     @GetMapping("")
-    public BaseResponse<List<Profile>> getReceivedMatchingProfiles(){
+    public BaseResponse<List<GetUserRes>> getReceivedMatchings(){
         try{
-            List<Profile> profiles = matchingService.getReceivedMatchingProfiles();
-            return new BaseResponse<>(profiles);
+            Long userId = jwtService.getUserIdx();
+            List<GetUserRes> receivedMatchings = matchingService.getReceivedMatchings(userId);
+            return new BaseResponse<>(receivedMatchings);
         }catch(BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
@@ -77,9 +81,10 @@ public class MatchingController {
 
     //매칭된 친구 프로필 조회
     @GetMapping("/friend")
-    public BaseResponse<List<Profile>> getMyFriends(){
+    public BaseResponse<List<GetUserRes>> getMyFriends(){
         try{
-            List<Profile> friends = matchingService.getMatchedFriends();
+            Long userId = jwtService.getUserIdx();
+            List<GetUserRes> friends = matchingService.getMatchedFriends(userId);
             return new BaseResponse<>(friends);
         }catch(BaseException exception){
             return new BaseResponse<>(exception.getStatus());
