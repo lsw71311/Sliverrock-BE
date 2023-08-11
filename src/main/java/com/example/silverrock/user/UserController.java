@@ -7,10 +7,17 @@ import com.example.silverrock.user.dto.PostLoginReq;
 import com.example.silverrock.user.dto.PostLoginRes;
 import com.example.silverrock.user.dto.PostUserReq;
 import com.example.silverrock.user.dto.PostUserRes;
+import com.example.silverrock.user.profile.Profile;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,6 +60,16 @@ public class UserController {
         try {
             Long userId = jwtService.getLogoutUserIdx(); // 토큰 만료 상황에서 로그아웃을 시도하면 0L을 반환
             return new BaseResponse<>(userService.logout(userId));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    @GetMapping("/near")
+    public BaseResponse<List<Profile>> getNearUser(){
+        try {
+            List<Profile> profiles = userService.getProfilesByRegion();
+            return new BaseResponse<>(profiles);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
