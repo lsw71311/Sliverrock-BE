@@ -1,4 +1,4 @@
-package com.example.silverrock.matching.Service;//package com.example.silverrock.matching.Service;
+package com.example.silverrock.matching.Service;
 
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.login.jwt.JwtService;
@@ -7,6 +7,7 @@ import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
+import com.example.silverrock.user.dto.PostLoginRes;
 import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
+import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -29,15 +31,32 @@ public class MatchingService {
     private final UserRepository userRepository;
 
     //매칭 요청 matchingRequest
-    public Long matchingRequest(PostMatcingReq postMatcingReq){
-        Long userId = jwtService.getUserIdx(); //토큰에서 유저고유번호 받아오기...!
-        Matching matching =new Matching(
-                postMatcingReq.getSender(), postMatcingReq.getReceiver(), false
-                //요청 수신자와 발신자 고유번호를 받아옴. 성공여부는 false기본값으로 저장
-        );
-        matchingRequestRepository.save(matching);  //매칭 정보들 저장. 이거 스프링 프레임워크에서 자동으로 만들어줘야 하는건가?!
+//    public Long matchingRequest(PostMatcingReq postMatcingReq){
+//        Long userId = jwtService.getUserIdx(); //토큰에서 유저고유번호 받아오기...!
+//        User user = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
+//        Matching matching =new Matching(
+//                postMatcingReq.getSender(), postMatcingReq.getReceiver(), false
+//                //요청 수신자와 발신자 고유번호를 받아옴. 성공여부는 false기본값으로 저장
+//        );
+//        matchingRequestRepository.save(matching);  //매칭 정보들 저장. 이거 스프링 프레임워크에서 자동으로 만들어줘야 하는건가?!
+//
+//        return matching.getMatchingId(); //디비에 자동 생성 저장된 매칭아이디 가져와서 프론트에 반환해주기
+//    }
+    public Long matchingRequest(PostMatcingReq postMatcingReq, Long receiverId) {
+        Long senderId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (sender) 받아오기
+        User sender = userRepository.findUserById(senderId).orElse(null); // sender 정보(고유아이디, 폰넘버, 성별 등..) 가져오기
+        User receiver = userRepository.findUserById(receiverId).orElse(null); // receiver 정보 가져오기
 
-        return matching.getMatchingId(); //디비에 자동 생성 저장된 매칭아이디 가져와서 프론트에 반환해주기
+        if (sender == null || receiver == null) {// 유효한 유저 정보가 없는 경우 예외 처리
+            throw new BaseException(USER_NOT_FOUND);
+        }
+
+        Matching matching = new Matching(
+                sender.getId(), receiver.getId(), false // sender, receiver, 성공 여부 데이터 설정
+        );
+        matchingRequestRepository.save(matching); // 매칭 정보 저장
+
+        return matching.getMatchingId(); // 생성된 매칭 아이디 반환
     }
 
     // 매칭 수락
@@ -45,9 +64,10 @@ public class MatchingService {
         Optional<Matching> existingMatching = matchingRequestRepository.findById(matchingId); //Optional객체: 해당 매칭 아이디가 있을 경우에만 처리
 
         if (existingMatching.isPresent()) {
-            Matching matching = existingMatching.get();
-            matching.setSuccess(true);
-            matchingRequestRepository.save(matching);
+            Matching matching = existingMatching.get(); //존재하는(입력받은) 매칭아이디에 해당하는 정보를 matching변수에 저장.
+            matching.setSuccess(true); //matching변수에 속한 success정보를 true로 세팅
+            matchingRequestRepository.save(matching); //변경 내용 저장
+
         } else {
             throw new BaseException(MATCHING_NOT_FOUND);
         }

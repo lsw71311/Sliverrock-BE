@@ -1,5 +1,7 @@
 package com.example.silverrock.matching.controller;
 
+import com.example.silverrock.global.Response.BaseResponse;
+import com.example.silverrock.global.Response.BaseResponseStatus;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
@@ -22,28 +24,28 @@ public class MatchingController {
 
     //매칭 요청
     @PostMapping("/{receiver}")
-    public Long matchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq request) {
-        Long matchingId = matchingService.matchingRequest(request);
-
-        return matchingId;
+    public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq postMatcingReq) {
+        Long matchingId = matchingService.matchingRequest(postMatcingReq,receiver);
+//        return new BaseResponse<>(matchingService.matchingRequest(matchingId,postMatcingReq));
+        return new BaseResponse<>(matchingId);
     }
 
     //매칭 수락
     // 매칭 수락
     @PostMapping("/accept/{matching_id}")
-    public String acceptMatching(@PathVariable("matching_id") Long matchingId) {
+    public BaseResponse acceptMatching(@PathVariable("matching_id") Long matchingId) {
         matchingService.acceptMatching(matchingId);
 
-        return "'ㅇㅇㅇ'님이 친구 요청을 수락하셨습니다.";
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 
 
     //매칭 거절
     @DeleteMapping("/reject/{matching_id}")
-    public String rejectMatchingRequest(@PathVariable("matching_id") Long matchingId) {
+    public BaseResponse rejectMatchingRequest(@PathVariable("matching_id") Long matchingId) {
         matchingService.rejectMatching(matchingId);
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
 
-        return "Matching request rejected and deleted.";
     }
 
 }
