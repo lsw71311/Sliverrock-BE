@@ -1,4 +1,4 @@
-package com.example.silverrock.matching.Service;
+package com.example.silverrock.matching.Service;//package com.example.silverrock.matching.Service;
 
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.login.jwt.JwtService;
@@ -7,6 +7,8 @@ import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
+import com.example.silverrock.user.dto.GetS3Res;
+import com.example.silverrock.user.dto.GetUserRes;
 import com.example.silverrock.user.dto.PostLoginRes;
 import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
@@ -17,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.example.silverrock.global.Response.BaseResponseStatus.*;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
 import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
@@ -26,6 +31,7 @@ import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT
 public class MatchingService {
     private final MatchingRequestRepository matchingRequestRepository;
     private final JwtService jwtService;
+    private final ProfileService profileService;
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
 
@@ -71,42 +77,52 @@ public class MatchingService {
 
 
     //내가 받은 매칭 요청 조회
-    public List<Profile> getReceivedMatchingProfiles() throws BaseException {
-        Long userId = jwtService.getUserIdx();      //나의 id 가져와
-        User user = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
-        List<Matching> matchings = matchingRequestRepository.findMatchingByReceiver(user).get();  // receiver가 '나'인 매칭 조회
-        Long sender;
-        List<Profile> receivedProfiles = new ArrayList<>();
+    public List<GetUserRes> getReceivedMatchings(Long userId) throws BaseException {
+        User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
+        List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
+        User sender;
+        List<User> senders = new ArrayList<>();
 
-        for(Matching matching : matchings){
-            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
-            Profile profile = profileRepository.findProfileById(sender).orElse(null);
-            receivedProfiles.add(profile);      //해당 프로필 목록에 추가
+        if(receivedmatchings.isEmpty()){
+            throw new BaseException(NONE_RECEIVED);
         }
 
-        return receivedProfiles;    //sender 프로필 목록 반환
+        for(Matching matching : receivedmatchings){
+            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
+            senders.add(sender);
+        }
+
+        List<GetUserRes> receivedUserRes = senders.stream()
+                .map(user -> new GetUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+
+        return receivedUserRes;    //sender 목록 반환
     }
 
-    //매칭된 친구 프로필 조회
-    public List<Profile> getMatchedFriends() throws BaseException{
-        Long userId = jwtService.getUserIdx();      //나의 id 가져와
-        User user = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
-        List<Matching> matchings = matchingRequestRepository.findMatchingByReceiver(user).get();  //receiver가 '나'인 매칭 조회
-//        Long senderId;
-        Long sender;
-        List<Profile> friends = new ArrayList<>();
 
-        for(Matching matching : matchings){
-            if(matching.isSuccess() == true){   //매칭의 success가 true인 경우(매칭된 경우)
-                sender = matching.getSender();    //해당 매칭의 sender 받아와서
-//                Profile profile = profileRepository.findProfileById(senderId).orElse(null);
-                Profile profile = profileRepository.findProfileById(sender).orElse(null);
-                friends.add(profile);   //매칭된 친구 목록에 프로필 추가
+    //매칭된 친구 조회
+    public List<GetUserRes> getMatchedFriends(Long userId) throws BaseException {
+        User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
+        List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
+        User friend;
+        List<User> friends = new ArrayList<>();
+
+        for(Matching matching : receivedmatchings){
+            if(matching.isSuccess() == true){   //매칭의 success가 true이면
+                friend = matching.getSender();  //친구 목록에 추가
+                friends.add(friend);
             }
         }
 
-        return friends;     //친구 목록 반환
+        if(friends.isEmpty()){
+            throw new BaseException(NONE_FREIND);
+        }
+
+        List<GetUserRes> friendResList = friends.stream()
+                .map(user -> new GetUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                        new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+
+        return friendResList;    //친구 목록 반환
     }
 
 }
-

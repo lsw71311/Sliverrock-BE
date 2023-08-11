@@ -42,6 +42,9 @@ public enum BaseResponseStatus {
     PASSWORD_MISSMATCH(false, HttpStatus.NOT_FOUND.value(), "비밀번호가 일치하지 않습니다."),
     DUPLICATED_NICKNAME(false, HttpStatus.NOT_FOUND.value(), "이미 존재하는 닉네임입니다."),
     ALREADY_LOGIN(false, HttpStatus.NOT_FOUND.value(), "이미 로그인한 사용자입니다."),
+    NONE_NEAR(false, HttpStatus.NOT_FOUND.value(), "근처 사용자가 없습니다."),
+    NONE_RECEIVED(false, HttpStatus.NOT_FOUND.value(), "요청받은 매칭이 없습니다."),
+    NONE_FREIND(false, HttpStatus.NOT_FOUND.value(), "매칭된 친구가 없습니다."),
 
 
     /**
