@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Matching extends BaseTimeEntity {
     @Column
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)// AUTO_INCREMENT 사용(순차적생성)
     private Long matchingId; // 매칭 고유번호
 
     @Column(nullable = false)
