@@ -7,6 +7,7 @@ import com.example.silverrock.global.UtilService;
 import com.example.silverrock.login.dto.JwtResponseDTO;
 import com.example.silverrock.login.jwt.*;
 import com.example.silverrock.user.dto.*;
+import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.silverrock.global.AES128;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.*;
 
@@ -126,6 +131,39 @@ public class UserService {
 
     }
 
+//    public List<Profile> getProfilesByRegion(String region) throws BaseException{
+//        List<User> usersInSameRegion = userRepository.findByRegion(region);
+//        List<Profile> profiles = new ArrayList<>();
+//
+//        for (User user : usersInSameRegion) {
+//            Optional<Profile> profileOptional = profileRepository.findProfileById(user.getId());
+//
+//            if (profileOptional.isPresent()) {
+//                profiles.add(profileOptional.get());
+//            }
+////            profileOptional.ifPresent(profile -> profiles.add(profile));
+//        }
+//
+//        return profiles;
+//    }
 
+    public List<Profile> getProfilesByRegion() throws BaseException{
+        Long userId = jwtService.getUserIdx();
+        String region = userRepository.findUserById(userId).get().getRegion();
+
+        List<User> usersInSameRegion = userRepository.findByRegion(region);
+        List<Profile> profiles = new ArrayList<>();
+
+        for (User user : usersInSameRegion) {
+            Optional<Profile> profileOptional = profileRepository.findProfileById(user.getId());
+
+            if (profileOptional.isPresent()) {
+                profiles.add(profileOptional.get());
+            }
+//            profileOptional.ifPresent(profile -> profiles.add(profile));
+        }
+
+        return profiles;
+    }
 
 }

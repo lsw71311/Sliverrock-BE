@@ -1,22 +1,28 @@
 package com.example.silverrock.matching.controller;//package com.example.silverrock.matching.controller;
-//
-//import com.example.silverrock.matching.dto.PostMatcingReq;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.concurrent.atomic.AtomicLong;
-//
-//@RequiredArgsConstructor
-//@RestController
-//@RequestMapping("/matching")
-//public class MatchingController {
-//
+
+import com.example.silverrock.global.Response.BaseException;
+import com.example.silverrock.global.Response.BaseResponse;
+import com.example.silverrock.matching.Service.MatchingService;
+import com.example.silverrock.matching.dto.PostMatcingReq;
+import com.example.silverrock.matching.repository.MatchingRequestRepository;
+import com.example.silverrock.user.profile.Profile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/matching")
+public class MatchingController {
+
+    private final MatchingService matchingService;
 //    @Autowired
 //    private MatchingRequestRepository matchingRequestRepository;
-//
 //    private AtomicLong matchingIdGenerator = new AtomicLong(1);
-//
+
 //    //매칭 요청
 //    @PostMapping("/{receiver}")
 //    public String sendMatchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq request) {
@@ -56,4 +62,28 @@ package com.example.silverrock.matching.controller;//package com.example.silverr
 //            return "Matching request not found.";
 //        }
 //    }
-//}
+
+
+    //내가 받은 매칭 요청 조회(요청자의 프로필 전체 조회)
+    @GetMapping("")
+    public BaseResponse<List<Profile>> getReceivedMatchingProfiles(){
+        try{
+            List<Profile> profiles = matchingService.getReceivedMatchingProfiles();
+            return new BaseResponse<>(profiles);
+        }catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    //매칭된 친구 프로필 조회
+    @GetMapping("/friend")
+    public BaseResponse<List<Profile>> getMyFriends(){
+        try{
+            List<Profile> friends = matchingService.getMatchedFriends();
+            return new BaseResponse<>(friends);
+        }catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+}

@@ -2,7 +2,9 @@ package com.example.silverrock.user;
 
 import com.example.silverrock.global.BaseTimeEntity;
 import com.example.silverrock.login.jwt.Token;
+import com.example.silverrock.matching.Entity.Matching;
 import com.example.silverrock.user.profile.Profile;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -47,6 +49,22 @@ public class User extends BaseTimeEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile; // 프로필 사진과 일대일 매핑
+
+    @OneToMany(
+            mappedBy = "sender",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
+    @JsonBackReference
+    private List<Matching> sentMatchings;
+
+    @OneToMany(
+            mappedBy = "receiver",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
+    @JsonBackReference
+    private List<Matching> receivedMatchings;
 
     @Builder
     public User(String phoneNum, String gender, String nickname, String birth, String region, String password, String introduce) {
