@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface MatchingRequestRepository extends JpaRepository<Matching, Long> {
-
     Optional<List<Matching>> findMatchingByReceiver(User user);
 }

@@ -9,8 +9,6 @@ import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
 import com.example.silverrock.user.dto.GetS3Res;
 import com.example.silverrock.user.dto.GetUserRes;
-import com.example.silverrock.user.dto.PostLoginRes;
-import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +46,6 @@ public class MatchingService {
                 sender.getId(), receiver.getId(), false // sender, receiver, 성공 여부 데이터 설정
         );
         matchingRequestRepository.save(matching); // 매칭 정보 저장
-
         return matching.getMatchingId(); // 생성된 매칭 아이디 반환
     }
 
@@ -88,8 +85,8 @@ public class MatchingService {
         }
 
         for(Matching matching : receivedmatchings){
-            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
-            senders.add(sender);
+//            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
+//            senders.add(sender);
         }
 
         List<GetUserRes> receivedUserRes = senders.stream()
@@ -109,8 +106,8 @@ public class MatchingService {
 
         for(Matching matching : receivedmatchings){
             if(matching.isSuccess() == true){   //매칭의 success가 true이면
-                friend = matching.getSender();  //친구 목록에 추가
-                friends.add(friend);
+//                friend = matching.getSender();  //친구 목록에 추가
+//                friends.add(friend);
             }
         }
 
