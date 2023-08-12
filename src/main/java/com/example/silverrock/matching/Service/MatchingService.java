@@ -42,7 +42,7 @@ public class MatchingService {
 //
 //        return matching.getMatchingId(); //디비에 자동 생성 저장된 매칭아이디 가져와서 프론트에 반환해주기
 //    }
-    public Long matchingRequest(PostMatcingReq postMatcingReq, Long receiverId) {
+    public Long matchingRequest(Long receiverId) {
         Long senderId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (sender) 받아오기
         User sender = userRepository.findUserById(senderId).orElse(null); // sender 정보(고유아이디, 폰넘버, 성별 등..) 가져오기
         User receiver = userRepository.findUserById(receiverId).orElse(null); // receiver 정보 가져오기
