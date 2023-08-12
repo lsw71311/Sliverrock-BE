@@ -7,6 +7,7 @@ import com.example.silverrock.global.UtilService;
 import com.example.silverrock.login.dto.JwtResponseDTO;
 import com.example.silverrock.login.jwt.*;
 import com.example.silverrock.user.dto.*;
+import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.silverrock.global.AES128;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.*;
 
@@ -126,6 +132,21 @@ public class UserService {
 
     }
 
+    public List<GetNearUserRes> getProfilesByRegion(Long userId) throws BaseException{
 
+        User currentUser = userRepository.findUserById(userId).get();
+        String region=currentUser.getRegion();
+
+        List<User> usersInSameRegion = userRepository.findByRegionAndIdNot(region, userId); // 같은 지역이면서 나는 제외해서 조회되도록
+        if(usersInSameRegion.isEmpty()){
+            throw new BaseException(NONE_NEAR);
+        }
+
+        List<GetNearUserRes> getNearUserRes= usersInSameRegion.stream()
+                .map(user -> new GetNearUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                        new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+
+        return getNearUserRes;
+    }
 
 }
