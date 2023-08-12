@@ -2,6 +2,7 @@ package com.example.silverrock.matching.Entity;
 
 import com.example.silverrock.global.BaseTimeEntity;
 import com.example.silverrock.user.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,16 +16,17 @@ import javax.persistence.*;
 public class Matching extends BaseTimeEntity {
     @Column
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)// AUTO_INCREMENT 사용(순차적생성)
     private Long matchingId; // 매칭 고유번호
 
-    @ManyToOne()
-    @JoinColumn(name = "sender_id", nullable = false)
-    private User sender; // 매칭 요청 발신자
+    @ManyToOne // @Column 어노테이션 제거
+    @JoinColumn(name="sender") // 실제 데이터베이스 컬럼명 설정
+    @JsonBackReference
+    private User sender;
 
-    @ManyToOne()
-    @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver; // 매칭 요청 수신자
+    @ManyToOne // @Column 어노테이션 제거
+    @JoinColumn(name="receiver") // 실제 데이터베이스 컬럼명 설정
+    private User receiver;
 
     @Column(nullable = true)
     private boolean success; // 매칭 성공여부 t/f
@@ -34,8 +36,7 @@ public class Matching extends BaseTimeEntity {
         this.sender = sender;
         this.receiver = receiver;
         this.success=success;
+
     }
-
-
 }
 

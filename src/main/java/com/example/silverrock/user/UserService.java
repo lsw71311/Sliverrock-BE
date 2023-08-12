@@ -132,22 +132,6 @@ public class UserService {
 
     }
 
-//    public List<Profile> getProfilesByRegion(String region) throws BaseException{
-//        List<User> usersInSameRegion = userRepository.findByRegion(region);
-//        List<Profile> profiles = new ArrayList<>();
-//
-//        for (User user : usersInSameRegion) {
-//            Optional<Profile> profileOptional = profileRepository.findProfileById(user.getId());
-//
-//            if (profileOptional.isPresent()) {
-//                profiles.add(profileOptional.get());
-//            }
-////            profileOptional.ifPresent(profile -> profiles.add(profile));
-//        }
-//
-//        return profiles;
-//    }
-
     public List<GetNearUserRes> getProfilesByRegion(Long userId) throws BaseException{
 
         User currentUser = userRepository.findUserById(userId).get();
