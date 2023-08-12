@@ -24,6 +24,9 @@ import static com.example.silverrock.global.Response.BaseResponseStatus.*;
 import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
 import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
 
+import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
+import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
+
 @RequiredArgsConstructor
 @Service
 public class MatchingService {
@@ -72,6 +75,25 @@ public class MatchingService {
         }
     }
 
+
+    //내가 받은 매칭 요청 조회
+    public List<Profile> getReceivedMatchingProfiles() throws BaseException {
+        Long userId = jwtService.getUserIdx();      //나의 id 가져와
+        User user = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
+        List<Matching> matchings = matchingRequestRepository.findMatchingByReceiver(user).get();  // receiver가 '나'인 매칭 조회
+//        Long senderId;
+        Long sender;
+        List<Profile> receivedProfiles = new ArrayList<>();
+
+        for(Matching matching : matchings){
+            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
+//            Profile profile = profileRepository.findProfileById(senderId).orElse(null);     //sender id로 해당 프로필 조회
+            Profile profile = profileRepository.findProfileById(sender).orElse(null);
+            receivedProfiles.add(profile);      //해당 프로필 목록에 추가
+        }
+
+        return receivedProfiles;    //sender 프로필 목록 반환
+    }
 
     //내가 받은 매칭 요청 조회
     public List<GetUserRes> getReceivedMatchings(Long userId) throws BaseException {

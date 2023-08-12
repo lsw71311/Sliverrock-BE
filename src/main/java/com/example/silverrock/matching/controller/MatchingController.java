@@ -57,7 +57,6 @@ public class MatchingController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
-
     }
 
     //매칭된 친구 프로필 조회
@@ -72,4 +71,3 @@ public class MatchingController {
         }
     }
 }
-
