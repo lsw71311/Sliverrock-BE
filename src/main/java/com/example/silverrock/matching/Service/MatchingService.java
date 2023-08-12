@@ -75,26 +75,6 @@ public class MatchingService {
         }
     }
 
-
-    //내가 받은 매칭 요청 조회
-    public List<Profile> getReceivedMatchingProfiles() throws BaseException {
-        Long userId = jwtService.getUserIdx();      //나의 id 가져와
-        User user = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
-        List<Matching> matchings = matchingRequestRepository.findMatchingByReceiver(user).get();  // receiver가 '나'인 매칭 조회
-//        Long senderId;
-        Long sender;
-        List<Profile> receivedProfiles = new ArrayList<>();
-
-        for(Matching matching : matchings){
-            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
-//            Profile profile = profileRepository.findProfileById(senderId).orElse(null);     //sender id로 해당 프로필 조회
-            Profile profile = profileRepository.findProfileById(sender).orElse(null);
-            receivedProfiles.add(profile);      //해당 프로필 목록에 추가
-        }
-
-        return receivedProfiles;    //sender 프로필 목록 반환
-    }
-
     //내가 받은 매칭 요청 조회
     public List<GetUserRes> getReceivedMatchings(Long userId) throws BaseException {
         User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
@@ -102,13 +82,15 @@ public class MatchingService {
         User sender;
         List<User> senders = new ArrayList<>();
 
-        if(receivedmatchings.isEmpty()){
-            throw new BaseException(NONE_RECEIVED);
+        for(Matching matching : receivedmatchings){     //receiver가 '나'인 매칭 중
+            if(matching.isSuccess() == false) {     //success가 false이면
+                sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
+                senders.add(sender);    //띄워줄 목록에 추가
+            }
         }
 
-        for(Matching matching : receivedmatchings){
-            sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
-            senders.add(sender);
+        if(senders.isEmpty()){
+            throw new BaseException(NONE_RECEIVED);
         }
 
         List<GetUserRes> receivedUserRes = senders.stream()
@@ -122,11 +104,20 @@ public class MatchingService {
     //매칭된 친구 조회
     public List<GetUserRes> getMatchedFriends(Long userId) throws BaseException {
         User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
+        List<Matching> mymatchings = new ArrayList<>();     //receiver나 sender가 '나'인 매칭 담을
         List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
+        List<Matching> sentmatchings = matchingRequestRepository.findMatchingBySender(me).get();    //sender가 '나'인 매칭 조회
         User friend;
         List<User> friends = new ArrayList<>();
 
-        for(Matching matching : receivedmatchings){
+        for(Matching matching : receivedmatchings){     //receiver가 나 인 매칭들을 목록에 추가
+            mymatchings.add(matching);
+        }
+        for(Matching matching : sentmatchings){         //sender가 나 인 매칭들을 목록에 추가
+            mymatchings.add(matching);
+        }
+
+        for(Matching matching : mymatchings){
             if(matching.isSuccess() == true){   //매칭의 success가 true이면
                 friend = matching.getSender();  //친구 목록에 추가
                 friends.add(friend);
