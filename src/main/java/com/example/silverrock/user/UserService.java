@@ -20,6 +20,7 @@ import com.example.silverrock.global.AES128;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.*;
 
@@ -131,39 +132,21 @@ public class UserService {
 
     }
 
-//    public List<Profile> getProfilesByRegion(String region) throws BaseException{
-//        List<User> usersInSameRegion = userRepository.findByRegion(region);
-//        List<Profile> profiles = new ArrayList<>();
-//
-//        for (User user : usersInSameRegion) {
-//            Optional<Profile> profileOptional = profileRepository.findProfileById(user.getId());
-//
-//            if (profileOptional.isPresent()) {
-//                profiles.add(profileOptional.get());
-//            }
-////            profileOptional.ifPresent(profile -> profiles.add(profile));
-//        }
-//
-//        return profiles;
-//    }
+    public List<GetNearUserRes> getProfilesByRegion(Long userId) throws BaseException{
 
-    public List<Profile> getProfilesByRegion() throws BaseException{
-        Long userId = jwtService.getUserIdx();
-        String region = userRepository.findUserById(userId).get().getRegion();
+        User currentUser = userRepository.findUserById(userId).get();
+        String region=currentUser.getRegion();
 
-        List<User> usersInSameRegion = userRepository.findByRegion(region);
-        List<Profile> profiles = new ArrayList<>();
-
-        for (User user : usersInSameRegion) {
-            Optional<Profile> profileOptional = profileRepository.findProfileById(user.getId());
-
-            if (profileOptional.isPresent()) {
-                profiles.add(profileOptional.get());
-            }
-//            profileOptional.ifPresent(profile -> profiles.add(profile));
+        List<User> usersInSameRegion = userRepository.findByRegionAndIdNot(region, userId); // 같은 지역이면서 나는 제외해서 조회되도록
+        if(usersInSameRegion.isEmpty()){
+            throw new BaseException(NONE_NEAR);
         }
 
-        return profiles;
+        List<GetNearUserRes> getNearUserRes= usersInSameRegion.stream()
+                .map(user -> new GetNearUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                        new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+
+        return getNearUserRes;
     }
 
 }

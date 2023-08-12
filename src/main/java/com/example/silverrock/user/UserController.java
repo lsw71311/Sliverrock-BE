@@ -3,12 +3,13 @@ package com.example.silverrock.user;
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
 import com.example.silverrock.login.jwt.JwtService;
+import com.example.silverrock.user.dto.*;
+import com.example.silverrock.user.profile.Profile;
+import lombok.Getter;
 import com.example.silverrock.user.dto.PostLoginReq;
 import com.example.silverrock.user.dto.PostLoginRes;
 import com.example.silverrock.user.dto.PostUserReq;
 import com.example.silverrock.user.dto.PostUserRes;
-import com.example.silverrock.user.profile.Profile;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -65,11 +66,14 @@ public class UserController {
         }
     }
 
+    /**
+     * 근처 친구 전체 조회 (메인화면)
+     */
     @GetMapping("/near")
-    public BaseResponse<List<Profile>> getNearUser(){
+    public BaseResponse<List<GetNearUserRes>> getNearUser(){
         try {
-            List<Profile> profiles = userService.getProfilesByRegion();
-            return new BaseResponse<>(profiles);
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(userService.getProfilesByRegion(userId));
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
