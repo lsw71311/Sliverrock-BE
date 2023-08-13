@@ -2,16 +2,18 @@ package com.example.silverrock.matching.controller;
 
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
-import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.global.Response.BaseResponseStatus;
+import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
+import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.dto.GetUserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,11 +26,12 @@ public class MatchingController {
 
     //매칭 요청
     @PostMapping("/{receiver}")
-    public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq postMatcingReq) {
-        Long matchingId = matchingService.matchingRequest(postMatcingReq,receiver);
+    public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver) {
+        Long matchingId = matchingService.matchingRequest(receiver);
         return new BaseResponse<>(matchingId);
     }
 
+    //매칭 수락
     // 매칭 수락
     @PostMapping("/accept/{matching_id}")
     public BaseResponse acceptMatching(@PathVariable("matching_id") Long matchingId) {
