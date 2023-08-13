@@ -24,8 +24,8 @@ public class MatchingController {
 
     //매칭 요청
     @PostMapping("/{receiver}")
-    public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver, @RequestBody PostMatcingReq postMatcingReq) {
-        Long matchingId = matchingService.matchingRequest(postMatcingReq,receiver);
+    public BaseResponse matchingRequest(@PathVariable("receiver") Long receiver) {
+        Long matchingId = matchingService.matchingRequest(receiver);
         return new BaseResponse<>(matchingId);
     }
 
