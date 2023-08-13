@@ -1,14 +1,18 @@
 package com.example.silverrock.matching.controller;
 
+import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
 import com.example.silverrock.global.Response.BaseResponseStatus;
+import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
+import com.example.silverrock.user.dto.GetUserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
