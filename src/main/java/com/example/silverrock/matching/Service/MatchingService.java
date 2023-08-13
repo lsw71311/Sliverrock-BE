@@ -1,4 +1,4 @@
-package com.example.silverrock.matching.Service;//package com.example.silverrock.matching.Service;
+package com.example.silverrock.matching.Service;
 
 import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.login.jwt.JwtService;
@@ -7,8 +7,8 @@ import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
-import com.example.silverrock.user.dto.GetS3Res;
-import com.example.silverrock.user.dto.GetUserRes;
+import com.example.silverrock.user.dto.PostLoginRes;
+import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.example.silverrock.global.Response.BaseResponseStatus.*;
-
-import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
-import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.MATCHING_NOT_FOUND;
 import static com.example.silverrock.global.Response.BaseResponseStatus.USER_NOT_FOUND;
@@ -49,6 +43,7 @@ public class MatchingService {
                 sender, receiver, false // sender, receiver, 성공 여부 데이터 설정
         );
         matchingRequestRepository.save(matching); // 매칭 정보 저장
+
         return matching.getMatchingId(); // 생성된 매칭 아이디 반환
     }
 

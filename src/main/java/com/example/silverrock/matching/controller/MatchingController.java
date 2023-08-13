@@ -1,17 +1,15 @@
 package com.example.silverrock.matching.controller;
 
-import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
-import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.global.Response.BaseResponseStatus;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
-import com.example.silverrock.user.dto.GetUserRes;
+import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,6 +27,7 @@ public class MatchingController {
         return new BaseResponse<>(matchingId);
     }
 
+    //매칭 수락
     // 매칭 수락
     @PostMapping("/accept/{matching_id}")
     public BaseResponse acceptMatching(@PathVariable("matching_id") Long matchingId) {
