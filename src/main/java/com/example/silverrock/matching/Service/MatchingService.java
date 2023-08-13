@@ -100,27 +100,24 @@ public class MatchingService {
         return receivedUserRes;    //sender 목록 반환
     }
 
-
     //매칭된 친구 조회
     public List<GetUserRes> getMatchedFriends(Long userId) throws BaseException {
         User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
-        List<Matching> mymatchings = new ArrayList<>();     //receiver나 sender가 '나'인 매칭 담을
         List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
         List<Matching> sentmatchings = matchingRequestRepository.findMatchingBySender(me).get();    //sender가 '나'인 매칭 조회
-        User friend;
+        User sender, receiver;
         List<User> friends = new ArrayList<>();
 
-        for(Matching matching : receivedmatchings){     //receiver가 나 인 매칭들을 목록에 추가
-            mymatchings.add(matching);
+        for(Matching matching : receivedmatchings){     //receiver가 나 인 매칭 중
+            if(matching.isSuccess() == true){           //매칭의 success가 true이면
+                sender = matching.getSender();          //매칭의 sender를 친구 목록에 추가
+                friends.add(sender);
+            }
         }
-        for(Matching matching : sentmatchings){         //sender가 나 인 매칭들을 목록에 추가
-            mymatchings.add(matching);
-        }
-
-        for(Matching matching : mymatchings){
-            if(matching.isSuccess() == true){   //매칭의 success가 true이면
-                friend = matching.getSender();  //친구 목록에 추가
-                friends.add(friend);
+        for(Matching matching : sentmatchings){     //sender가 나 인 매칭 중
+            if(matching.isSuccess() == true){       //매칭의 success가 true이면
+                receiver = matching.getReceiver();  //매칭의 receiver를 친구 목록에 추가
+                friends.add(receiver);
             }
         }
 
