@@ -20,12 +20,11 @@ public class Matching extends BaseTimeEntity {
     private Long matchingId; // 매칭 고유번호
 
     @ManyToOne // @Column 어노테이션 제거
-    @JoinColumn(name="sender") // 실제 데이터베이스 컬럼명 설정
-    @JsonBackReference
+    @JoinColumn(name="sender_id", nullable = false) // 실제 데이터베이스 컬럼명 설정
     private User sender;
 
     @ManyToOne // @Column 어노테이션 제거
-    @JoinColumn(name="receiver") // 실제 데이터베이스 컬럼명 설정
+    @JoinColumn(name="receiver_id", nullable = false) // 실제 데이터베이스 컬럼명 설정
     private User receiver;
 
     @Column(nullable = true)
