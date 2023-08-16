@@ -78,9 +78,6 @@ public class UserService {
     public PostLoginRes login(PostLoginReq postLoginReq) throws BaseException {
         User user = userRepository.findUserByPhoneNum(postLoginReq.getPhoneNum()).get();
         Token existToken = tokenRepository.findTokenByUserId(user.getId()).orElse(null);
-        if (existToken != null) {
-            throw new BaseException(ALREADY_LOGIN);
-        }
 
         String password;
         try {
@@ -89,15 +86,26 @@ public class UserService {
             throw new BaseException(PASSWORD_DECRYPTION_ERROR);
         }
 
+        JwtResponseDTO.TokenInfo tokenInfo = jwtProvider.generateToken(user.getId());
+
         if (postLoginReq.getPassword().equals(password)) {
-            JwtResponseDTO.TokenInfo tokenInfo = jwtProvider.generateToken(user.getId());
-            Token token = Token.builder()
-                    .accessToken(tokenInfo.getAccessToken())
-                    .refreshToken(tokenInfo.getRefreshToken())
-                    .user(user)
-                    .build();
-            tokenRepository.save(token);
-            return new PostLoginRes(user, token);
+            if (existToken != null) {
+                // Update existing token
+                existToken.setAccessToken(tokenInfo.getAccessToken());
+                existToken.setRefreshToken(tokenInfo.getRefreshToken());
+                Token updateToken = tokenRepository.save(existToken);
+                return new PostLoginRes(user, updateToken);
+            } else {
+                // Save new token
+                Token newToken = Token.builder()
+                        .accessToken(tokenInfo.getAccessToken())
+                        .refreshToken(tokenInfo.getRefreshToken())
+                        .user(user)
+                        .build();
+                tokenRepository.save(newToken);
+                return new PostLoginRes(user, newToken);
+            }
+
         } else {
             throw new BaseException(FAILED_TO_LOGIN);
         }
