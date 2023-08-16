@@ -37,5 +37,6 @@ public class Matching extends BaseTimeEntity {
         this.success=success;
 
     }
+
 }
 
