@@ -7,7 +7,6 @@ import com.example.silverrock.global.UtilService;
 import com.example.silverrock.login.dto.JwtResponseDTO;
 import com.example.silverrock.login.jwt.*;
 import com.example.silverrock.user.dto.*;
-import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.silverrock.global.AES128;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.silverrock.global.Response.BaseResponseStatus.*;
@@ -124,7 +121,7 @@ public class UserService {
                     tokenRepository.deleteTokenByAccessToken(token.getAccessToken());
                     return "로그아웃 되었습니다.";
                 }
-                else {
+                else {  //사용자가 존재하지 않는다면
                     throw new BaseException(INVALID_JWT);
                 }
             }
@@ -156,5 +153,42 @@ public class UserService {
 
         return getNearUserRes;
     }
+
+    //내 정보 조회
+    public GetUserInfoRes getUserInfo(Long userId) throws BaseException{
+
+        User currentUser = userRepository.findUserById(userId).get();
+        GetUserInfoRes userInfo = new GetUserInfoRes(
+                currentUser.getPhoneNum(),
+                currentUser.getGender(),
+                currentUser.getNickname(),
+                currentUser.getBirth(),
+                currentUser.getRegion(),
+                currentUser.getIntroduce(),
+                new GetS3Res(currentUser.getProfile().getProfileUrl(), currentUser.getProfile().getProfileFileName())
+        );
+
+        return userInfo;
+    }
+
+    //내 정보 수정
+    public GetUserInfoRes modifyUserInfo(Long userId, GetUserInfoReq userInfoReq) throws BaseException{
+
+        GetUserInfoRes currentUserInfo = getUserInfo(userId);   //기존 유저 정보
+
+        GetUserInfoRes newUserInfo = new GetUserInfoRes(
+                (userInfoReq.getPhoneNum().isEmpty() ? currentUserInfo.getPhoneNum() : userInfoReq.getPhoneNum()),
+                (userInfoReq.getGender().isEmpty() ? currentUserInfo.getGender() : userInfoReq.getGender()),
+                (userInfoReq.getNickname().isEmpty() ? currentUserInfo.getNickname() : userInfoReq.getNickname()),
+                (userInfoReq.getBirth().isEmpty() ? currentUserInfo.getBirth() : userInfoReq.getBirth()),
+                (userInfoReq.getRegion().isEmpty() ? currentUserInfo.getRegion() : userInfoReq.getRegion()),
+                (userInfoReq.getIntroduce().isEmpty() ? currentUserInfo.getIntroduce() : userInfoReq.getIntroduce()),
+                new GetS3Res(currentUserInfo.getGetS3Res().getImgUrl(), currentUserInfo.getGetS3Res().getFileName())
+        );
+        //사진은 요청시엔 받지 않고 기존 유저의 사진 그대로 반환
+
+        return newUserInfo;
+    }
+
 
 }

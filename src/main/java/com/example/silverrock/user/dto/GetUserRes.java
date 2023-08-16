@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetUserRes {
+    private String phoneNum; //유저 전화번호
     private String gender; // 유저의 성별
     private String nickname; // 유저의 닉네임
     private String birth; // 유저의 생년

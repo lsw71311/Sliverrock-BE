@@ -4,21 +4,16 @@ import com.example.silverrock.global.Response.BaseException;
 import com.example.silverrock.global.Response.BaseResponse;
 import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.user.dto.*;
-import com.example.silverrock.user.profile.Profile;
-import lombok.Getter;
 import com.example.silverrock.user.dto.PostLoginReq;
 import com.example.silverrock.user.dto.PostLoginRes;
 import com.example.silverrock.user.dto.PostUserReq;
 import com.example.silverrock.user.dto.PostUserRes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -75,6 +70,28 @@ public class UserController {
             Long userId = jwtService.getUserIdx();
             return new BaseResponse<>(userService.getProfilesByRegion(userId));
         } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    //내 정보 조회
+    @GetMapping("/myinfo")
+    public BaseResponse<GetUserInfoRes> getMyInfo(){
+        try{
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(userService.getUserInfo(userId));
+        }catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    //내 정보 수정(프로필 사진 제외)
+    @PatchMapping("/myinfo/modify")
+    public BaseResponse<GetUserInfoRes> modifyMyInfo(@RequestBody GetUserInfoReq userInfoReq){
+        try{
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(userService.modifyUserInfo(userId, userInfoReq));
+        }catch (BaseException exception){
             return new BaseResponse<>(exception.getStatus());
         }
     }

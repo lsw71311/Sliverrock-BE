@@ -7,6 +7,7 @@ import com.example.silverrock.login.jwt.JwtService;
 import com.example.silverrock.matching.Service.MatchingService;
 import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
+import com.example.silverrock.user.dto.GetNearUserRes;
 import com.example.silverrock.user.dto.GetUserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class MatchingController {
 
     //내가 받은 매칭 요청 조회(요청자의 프로필 전체 조회)
     @GetMapping("")
-    public BaseResponse<List<GetUserRes>> getReceivedMatchings() {
+    public BaseResponse<List<GetNearUserRes>> getReceivedMatchings() {
         try {
             Long userId = jwtService.getUserIdx();
-            List<GetUserRes> receivedMatchings = matchingService.getReceivedMatchings(userId);
+            List<GetNearUserRes> receivedMatchings = matchingService.getReceivedMatchings(userId);
             return new BaseResponse<>(receivedMatchings);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
