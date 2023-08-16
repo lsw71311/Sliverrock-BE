@@ -7,6 +7,7 @@ import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
+import com.example.silverrock.user.dto.GetNearUserRes;
 import com.example.silverrock.user.dto.GetS3Res;
 import com.example.silverrock.user.dto.GetUserRes;
 import com.example.silverrock.user.dto.PostLoginRes;
@@ -73,7 +74,7 @@ public class MatchingService {
     }
 
     //내가 받은 매칭 요청 조회
-    public List<GetUserRes> getReceivedMatchings(Long userId) throws BaseException {
+    public List<GetNearUserRes> getReceivedMatchings(Long userId) throws BaseException {
         User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
         List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
         User sender;
@@ -90,8 +91,8 @@ public class MatchingService {
             throw new BaseException(NONE_RECEIVED);
         }
 
-        List<GetUserRes> receivedUserRes = senders.stream()
-                .map(user -> new GetUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+        List<GetNearUserRes> receivedUserRes = senders.stream()
+                .map(user -> new GetNearUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
                 new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
 
         return receivedUserRes;    //sender 목록 반환
@@ -123,8 +124,9 @@ public class MatchingService {
         }
 
         List<GetUserRes> friendResList = friends.stream()
-                .map(user -> new GetUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                .map(user -> new GetUserRes(user.getPhoneNum(), user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
                         new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+        //매칭된 친구를 보여줄떄는 전화번호도 함께 반환
 
         return friendResList;    //친구 목록 반환
     }
