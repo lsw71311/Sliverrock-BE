@@ -64,12 +64,14 @@ public class MatchingService {
             Long receiverId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (receiver) 받아오기
             Long matchingReceiverId= matching.getReceiver().getId(); //현재 매칭아이디의 리시버의 아이디를 가져와
             Boolean successWhat=matching.isSuccess(); //석세스 정보 가져오기
-            if(receiverId==matchingReceiverId||successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
+            if(receiverId==matchingReceiverId&&successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
                 matching.setSuccess(true); //matching변수에 속한 success정보를 true로 세팅
                 matchingRequestRepository.save(matching); //변경 내용 저장
+            }        else {
+                throw new BaseException(MATCHING_NOT_FOUND);//유저id와 receiverId가 일치하지 않은 경우의 예외
             }
-        } else {
-            throw new BaseException(MATCHING_NOT_FOUND); //해당 matchingId가 존재하지 않거나, 유저id와 receiverId가 일치하지 않은 경우의 예외
+        }else {
+            throw new BaseException(MATCHING_NOT_FOUND);//해당 matchingId가 존재하지 않는 경우의 예외
         }
     }
 
@@ -82,13 +84,15 @@ public class MatchingService {
             Long receiverId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (receiver) 받아오기
             Long matchingReceiverId= matching.getReceiver().getId(); //현재 매칭아이디의 리시버의 아이디를 가져와
             Boolean successWhat=matching.isSuccess(); //석세스 정보 가져오기
-            if(receiverId==matchingReceiverId||successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
+            if(receiverId==matchingReceiverId&&successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
                 matchingRequestRepository.deleteById(matchingId); //해당 매칭아이디를 지우기
+            }        else {
+                throw new BaseException(MATCHING_NOT_FOUND);//유저id와 receiverId가 일치하지 않은 경우의 예외
             }
+        }else {
+            throw new BaseException(MATCHING_NOT_FOUND);//해당 matchingId가 존재하지 않는 경우의 예외
         }
-        else {
-            throw new BaseException(MATCHING_NOT_FOUND);//해당 matchingId가 존재하지 않거나, 유저id와 receiverId가 일치하지 않은 경우의 예외
-        }
+
     }
 
     //내가 받은 매칭 요청 조회
