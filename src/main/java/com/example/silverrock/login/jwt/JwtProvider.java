@@ -14,7 +14,8 @@ import java.util.Date;
 @Component
 public class JwtProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1 * 24 * 60 * 60 * 1000L; //refreshToken 유효기간 1일
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 60 * 1000L; //accessToken 유효기간 1시간
+  //  private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 60 * 1000L; //accessToken 유효기간 1시간
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 24 * 60 * 60 * 1000L; //accessToken 유효기간 1일
 
     // private static final long REFRESH_TOKEN_EXPIRE_TIME = 60 * 1000L; //refreshToken 유효기간 1분,  refrshToken 테스트를 위해 사용
     // private static final long ACCESS_TOKEN_EXPIRE_TIME = 10 * 1000L; //유효기간 10초, refrshToken 테스트를 위해 사용

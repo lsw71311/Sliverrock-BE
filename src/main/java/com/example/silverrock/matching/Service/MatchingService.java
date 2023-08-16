@@ -41,7 +41,12 @@ public class MatchingService {
         if (sender == null || receiver == null) {// 유효한 유저 정보가 없는 경우 예외 처리
             throw new BaseException(USER_NOT_FOUND);
         }
-
+        //기존 매칭 데이터 중 receiver와 sender가 새 매칭 데이터와 같으면서, success==false인 데이터가 이미 존재하면 예외처리.(동일한 매칭요청 불가능)
+        List<Matching> existingMatchings = matchingRequestRepository.findBySenderAndReceiverAndSuccess(sender, receiver, false);
+        if (!existingMatchings.isEmpty()) { //존재하는 매칭 데이터가 비어있지 않다면!
+            throw new BaseException(DUPLICATE_MATCHING_REQUEST);
+        }
+        //비어있으면 아래 매칭id 생성 실행
         Matching matching = new Matching(
                 sender, receiver, false // sender, receiver, 성공 여부 데이터 설정
         );
@@ -50,27 +55,44 @@ public class MatchingService {
         return matching.getMatchingId(); // 생성된 매칭 아이디 반환
     }
 
-    // 매칭 수락
+    // 매칭 수락 -> receiver 입장
     public void acceptMatching(Long matchingId) throws BaseException{
         Optional<Matching> existingMatching = matchingRequestRepository.findById(matchingId); //Optional객체: 해당 매칭 아이디가 있을 경우에만 처리
 
         if (existingMatching.isPresent()) {
             Matching matching = existingMatching.get(); //존재하는(입력받은) 매칭아이디에 해당하는 정보를 matching변수에 저장.
-            matching.setSuccess(true); //matching변수에 속한 success정보를 true로 세팅
-            matchingRequestRepository.save(matching); //변경 내용 저장
-
-        } else {
-            throw new BaseException(MATCHING_NOT_FOUND);
+            Long receiverId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (receiver) 받아오기
+            Long matchingReceiverId= matching.getReceiver().getId(); //현재 매칭아이디의 리시버의 아이디를 가져와
+            Boolean successWhat=matching.isSuccess(); //석세스 정보 가져오기
+            if(receiverId==matchingReceiverId&&successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
+                matching.setSuccess(true); //matching변수에 속한 success정보를 true로 세팅
+                matchingRequestRepository.save(matching); //변경 내용 저장
+            }        else {
+                throw new BaseException(MATCHING_NOT_FOUND);//유저id와 receiverId가 일치하지 않은 경우의 예외
+            }
+        }else {
+            throw new BaseException(MATCHING_NOT_FOUND);//해당 matchingId가 존재하지 않는 경우의 예외
         }
     }
 
-    // 매칭 거절
+    // 매칭 거절 -> receiver 입장
     public void rejectMatching(Long matchingId)throws BaseException {
-        if (matchingRequestRepository.existsById(matchingId)) {
-            matchingRequestRepository.deleteById(matchingId);
-        } else {
-            throw new BaseException(MATCHING_NOT_FOUND);
+        Optional<Matching> existingMatching = matchingRequestRepository.findById(matchingId); //Optional객체: 해당 매칭 아이디가 있을 경우에만 처리
+
+        if (existingMatching.isPresent()) {
+            Matching matching = existingMatching.get(); //존재하는(입력받은) 매칭아이디에 해당하는 정보를 matching변수에 저장.
+            Long receiverId = jwtService.getUserIdx(); // 토큰에서 유저 고유번호 (receiver) 받아오기
+            Long matchingReceiverId= matching.getReceiver().getId(); //현재 매칭아이디의 리시버의 아이디를 가져와
+            Boolean successWhat=matching.isSuccess(); //석세스 정보 가져오기
+            if(receiverId==matchingReceiverId&&successWhat==false){ //매칭의 리시버의 아이디와, 유저의 아이디가 같은지 확인 & success가 false인지 확인
+                matchingRequestRepository.deleteById(matchingId); //해당 매칭아이디를 지우기
+            }        else {
+                throw new BaseException(MATCHING_NOT_FOUND);//유저id와 receiverId가 일치하지 않은 경우의 예외
+            }
+        }else {
+            throw new BaseException(MATCHING_NOT_FOUND);//해당 matchingId가 존재하지 않는 경우의 예외
         }
+
     }
 
     //내가 받은 매칭 요청 조회

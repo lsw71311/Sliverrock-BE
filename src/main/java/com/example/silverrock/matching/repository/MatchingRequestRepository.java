@@ -12,4 +12,5 @@ public interface MatchingRequestRepository extends JpaRepository<Matching, Long>
     Optional<List<Matching>> findMatchingByReceiver(User user);
 
     Optional<List<Matching>> findMatchingBySender(User user);
+    List<Matching> findBySenderAndReceiverAndSuccess(User sender, User receiver, boolean success);
 }
