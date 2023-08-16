@@ -23,6 +23,20 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
 
+
+    /**
+     * 닉네임 중복확인
+     */
+    @GetMapping("/nickname")
+    public BaseResponse<String> checkNickname(@RequestParam(name="nickname") String nickname){
+        try {
+            return new BaseResponse<>(userService.checkNickname(nickname));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
     /**
      * 회원 가입
      */
@@ -35,6 +49,7 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
 
     /**
      * 로그인
@@ -60,6 +75,22 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+
+    /**
+     * 유저 프로필 사진 변경
+     */
+    @PatchMapping("/profile")
+    public BaseResponse<String> modifyProfile(@RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(userService.modifyProfile(userId, multipartFile));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
 
     /**
      * 근처 친구 전체 조회 (메인화면)
