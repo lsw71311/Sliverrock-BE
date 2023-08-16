@@ -7,6 +7,7 @@ import com.example.silverrock.global.UtilService;
 import com.example.silverrock.login.dto.JwtResponseDTO;
 import com.example.silverrock.login.jwt.*;
 import com.example.silverrock.user.dto.*;
+import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +48,6 @@ public class UserService {
         if(!postUserReq.getPassword().equals(postUserReq.getPasswordChk())) {
             throw new BaseException(PASSWORD_MISSMATCH);
         }
-        if(userRepository.existsByNickname(postUserReq.getNickname())) {
-            throw new BaseException(DUPLICATED_NICKNAME);
-        }
         String pwd;
         try{
             pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postUserReq.getPassword()); // 암호화 코드
@@ -68,6 +66,20 @@ public class UserService {
 
         return new PostUserRes(user);
     }
+
+
+    /**
+     * 닉네임 중복 확인
+     */
+    @Transactional
+    public String checkNickname(String nickname) throws BaseException {
+        if(userRepository.existsByNickname(nickname)) {
+            return "이미 존재하는 닉네임입니다.";
+        }
+        return "사용 가능한 닉네임입니다";
+    }
+
+
 
     /**
      * 유저 로그인 with JWT
@@ -105,6 +117,37 @@ public class UserService {
 
         } else {
             throw new BaseException(FAILED_TO_LOGIN);
+        }
+    }
+
+    /**
+     *  유저 프로필 변경
+     */
+    @Transactional
+    public String modifyProfile(Long userId, MultipartFile multipartFile) throws BaseException {
+        try {
+            User user = utilService.findByUserIdWithValidation(userId);
+            Profile profile = profileRepository.findProfileById(userId).orElse(null);
+            if(profile == null) { // 프로필이 미등록된 사용자가 변경을 요청하는 경우
+                GetS3Res getS3Res;
+                if(multipartFile != null) {
+                    getS3Res = s3Service.uploadSingleFile(multipartFile);
+                    profileService.saveProfile(getS3Res, user);
+                }
+            }
+            else { // 프로필이 등록된 사용자가 변경을 요청하는 경우
+                // 1. 버킷에서 삭제
+                profileService.deleteProfile(profile);
+                // 2. Profile Repository에서 삭제
+                profileService.deleteProfileById(userId);
+                if(multipartFile != null) {
+                    GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFile);
+                    profileService.saveProfile(getS3Res, user);
+                }
+            }
+            return "프로필 수정이 완료되었습니다.";
+        } catch (BaseException exception) {
+            throw new BaseException(exception.getStatus());
         }
     }
 
