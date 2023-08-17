@@ -61,7 +61,12 @@ public enum BaseResponseStatus {
     //매칭실패 예외
     MATCHING_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "해당 매칭을 찾을 수 없습니다."),
     //동일 매칭 요청 예외처리
-    DUPLICATE_MATCHING_REQUEST(false, HttpStatus.NOT_FOUND.value(), "이미 요청된 매칭입니다.");
+    DUPLICATE_MATCHING_REQUEST(false, HttpStatus.NOT_FOUND.value(), "이미 요청된 매칭입니다."),
+
+    //매칭 요청시 이미 친구 일때
+    ALREADY_FRIEND_REQUEST(false, HttpStatus.NOT_FOUND.value(), "이미 매칭된 친구입니다."),
+    //매칭 요청시 이미 상대에게서 온 요청이 있을때
+    ALREADY_RECEIVED_REQUEST(false, HttpStatus.NOT_FOUND.value(), "이미 상대로부터 받은 요청이 있습니다.");
 
     private final boolean isSuccess;
     private final int code;

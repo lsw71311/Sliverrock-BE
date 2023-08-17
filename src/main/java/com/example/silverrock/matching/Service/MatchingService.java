@@ -47,6 +47,18 @@ public class MatchingService {
         Matching matching = new Matching(
                 sender, receiver, false // sender, receiver, 성공 여부 데이터 설정
         );
+
+        //내가 요청 보낼 상대가 나에게 보낸 매칭이 있거나 이미 친구인지 확인 (success는 따지지않고 )
+        List<Matching> alreadyReceived = matchingRequestRepository.findBySenderAndReceiver(receiver, sender);
+        if(!alreadyReceived.isEmpty()){
+            for(Matching m : alreadyReceived){
+                if(m.isSuccess() == true){
+                    throw new BaseException(ALREADY_FRIEND_REQUEST);
+                }
+            }
+            throw new BaseException(ALREADY_RECEIVED_REQUEST);
+        }
+
         matchingRequestRepository.save(matching); // 매칭 정보 저장
 
         return matching.getMatchingId(); // 생성된 매칭 아이디 반환
