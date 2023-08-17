@@ -218,6 +218,7 @@ public class UserService {
     public GetUserInfoRes modifyUserInfo(Long userId, GetUserInfoReq userInfoReq) throws BaseException{
 
         GetUserInfoRes currentUserInfo = getUserInfo(userId);   //기존 유저 정보
+        User currentUser = userRepository.findUserById(userId).get();   //현재 유저
 
         String phoneNum = currentUserInfo.getPhoneNum();
         String gender = currentUserInfo.getGender();
@@ -231,23 +232,31 @@ public class UserService {
 
             if(userInfoReq.getPhoneNum() != null){
                 phoneNum = userInfoReq.getPhoneNum();
+                currentUser.setPhoneNum(phoneNum);      //수정 사항 있을시 변경되도록
             }
             if (userInfoReq.getGender() != null) {
                 gender = userInfoReq.getGender();
+                currentUser.setGender(gender);
             }
             if (userInfoReq.getNickname() != null) {
                 nickname = userInfoReq.getNickname();
+                currentUser.setNickname(nickname);
             }
             if (userInfoReq.getBirth() != null) {
                 birth = userInfoReq.getBirth();
+                currentUser.setBirth(birth);
             }
             if (userInfoReq.getRegion() != null) {
                 region = userInfoReq.getRegion();
+                currentUser.setRegion(region);
             }
             if (userInfoReq.getIntroduce() != null) {
                 introduce = userInfoReq.getIntroduce();
+                currentUser.setIntroduce(introduce);
             }
         }
+
+        userRepository.save(currentUser);       //변경 사항 db에 업데이트
 
         GetUserInfoRes newUserInfo = new GetUserInfoRes(
                 phoneNum, gender, nickname, birth, region, introduce, getS3Res
