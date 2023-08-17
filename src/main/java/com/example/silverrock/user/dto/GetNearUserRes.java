@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetNearUserRes {
+    private Long id;  //유저의 고유 id
     private String gender; // 유저의 성별
     private String nickname; // 유저의 닉네임
     private String birth; // 유저의 생년
