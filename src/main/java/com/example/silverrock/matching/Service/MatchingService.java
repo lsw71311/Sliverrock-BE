@@ -114,7 +114,7 @@ public class MatchingService {
         }
 
         List<GetNearUserRes> receivedUserRes = senders.stream()
-                .map(user -> new GetNearUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                .map(user -> new GetNearUserRes(user.getId(), user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
                 new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
 
         return receivedUserRes;    //sender 목록 반환
