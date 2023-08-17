@@ -7,10 +7,7 @@ import com.example.silverrock.matching.dto.PostMatcingReq;
 import com.example.silverrock.matching.repository.MatchingRequestRepository;
 import com.example.silverrock.user.User;
 import com.example.silverrock.user.UserRepository;
-import com.example.silverrock.user.dto.GetNearUserRes;
-import com.example.silverrock.user.dto.GetS3Res;
-import com.example.silverrock.user.dto.GetUserRes;
-import com.example.silverrock.user.dto.PostLoginRes;
+import com.example.silverrock.user.dto.*;
 import com.example.silverrock.user.profile.Profile;
 import com.example.silverrock.user.profile.ProfileRepository;
 import com.example.silverrock.user.profile.ProfileService;
@@ -96,26 +93,28 @@ public class MatchingService {
     }
 
     //내가 받은 매칭 요청 조회
-    public List<GetNearUserRes> getReceivedMatchings(Long userId) throws BaseException {
+    public List<ReceivedMatchingRes> getReceivedMatchings(Long userId) throws BaseException {
         User me = userRepository.findUserById(userId).orElse(null);   //id로 user객체 가져와
         List<Matching> receivedmatchings = matchingRequestRepository.findMatchingByReceiver(me).get();  // receiver가 '나'인 매칭 조회
-        User sender;
-        List<User> senders = new ArrayList<>();
+        List<Matching> toshowmatchings = new ArrayList<>();
 
         for(Matching matching : receivedmatchings){     //receiver가 '나'인 매칭 중
             if(matching.isSuccess() == false) {     //success가 false이면
-                sender = matching.getSender();    //위에서 받은 매칭의 sender 받아와
-                senders.add(sender);    //띄워줄 목록에 추가
+                toshowmatchings.add(matching);
             }
         }
 
-        if(senders.isEmpty()){
+        if(toshowmatchings.isEmpty()){
             throw new BaseException(NONE_RECEIVED);
         }
 
-        List<GetNearUserRes> receivedUserRes = senders.stream()
-                .map(user -> new GetNearUserRes(user.getId(), user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
-                new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
+        List<ReceivedMatchingRes> receivedUserRes = toshowmatchings.stream()
+                .map(matching -> new ReceivedMatchingRes(
+                        matching.getMatchingId(), matching.getSender().getGender(), matching.getSender().getNickname(),
+                        matching.getSender().getBirth(), matching.getSender().getRegion(), matching.getSender().getIntroduce(),
+                new GetS3Res(matching.getSender().getProfile().getProfileUrl(), matching.getSender().getProfile().getProfileFileName())
+                )).collect(Collectors.toList());
+        //매칭의 고유 id와 sender의 정보 반환
 
         return receivedUserRes;    //sender 목록 반환
     }
