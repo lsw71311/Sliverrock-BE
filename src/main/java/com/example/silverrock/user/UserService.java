@@ -191,7 +191,7 @@ public class UserService {
         }
 
         List<GetNearUserRes> getNearUserRes= usersInSameRegion.stream()
-                .map(user -> new GetNearUserRes(user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
+                .map(user -> new GetNearUserRes(user.getId(), user.getGender(), user.getNickname(), user.getBirth(), user.getRegion(), user.getIntroduce(),
                         new GetS3Res(user.getProfile().getProfileUrl(), user.getProfile().getProfileFileName()))).collect(Collectors.toList());
 
         return getNearUserRes;
@@ -218,6 +218,45 @@ public class UserService {
     public GetUserInfoRes modifyUserInfo(Long userId, GetUserInfoReq userInfoReq) throws BaseException{
 
         GetUserInfoRes currentUserInfo = getUserInfo(userId);   //기존 유저 정보
+        User currentUser = userRepository.findUserById(userId).get();   //현재 유저
+
+        String phoneNum = currentUserInfo.getPhoneNum();
+        String gender = currentUserInfo.getGender();
+        String nickname = currentUserInfo.getNickname();
+        String birth = currentUserInfo.getBirth();
+        String region = currentUserInfo.getRegion();
+        String introduce = currentUserInfo.getIntroduce();
+        GetS3Res getS3Res = new GetS3Res(currentUserInfo.getGetS3Res().getImgUrl(), currentUserInfo.getGetS3Res().getFileName());
+
+        if(userInfoReq != null){    //null인 경우 메소드 호출시 발생할 수 있는 NullPointerException 방지
+
+            if(userInfoReq.getPhoneNum() != null){
+                phoneNum = userInfoReq.getPhoneNum();
+                currentUser.setPhoneNum(phoneNum);      //수정 사항 있을시 변경되도록
+            }
+            if (userInfoReq.getGender() != null) {
+                gender = userInfoReq.getGender();
+                currentUser.setGender(gender);
+            }
+            if (userInfoReq.getNickname() != null) {
+                nickname = userInfoReq.getNickname();
+                currentUser.setNickname(nickname);
+            }
+            if (userInfoReq.getBirth() != null) {
+                birth = userInfoReq.getBirth();
+                currentUser.setBirth(birth);
+            }
+            if (userInfoReq.getRegion() != null) {
+                region = userInfoReq.getRegion();
+                currentUser.setRegion(region);
+            }
+            if (userInfoReq.getIntroduce() != null) {
+                introduce = userInfoReq.getIntroduce();
+                currentUser.setIntroduce(introduce);
+            }
+        }
+
+        userRepository.save(currentUser);       //변경 사항 db에 업데이트
 
         String phoneNum = currentUserInfo.getPhoneNum();
         String gender = currentUserInfo.getGender();
