@@ -258,36 +258,6 @@ public class UserService {
 
         userRepository.save(currentUser);       //변경 사항 db에 업데이트
 
-        String phoneNum = currentUserInfo.getPhoneNum();
-        String gender = currentUserInfo.getGender();
-        String nickname = currentUserInfo.getNickname();
-        String birth = currentUserInfo.getBirth();
-        String region = currentUserInfo.getRegion();
-        String introduce = currentUserInfo.getIntroduce();
-        GetS3Res getS3Res = new GetS3Res(currentUserInfo.getGetS3Res().getImgUrl(), currentUserInfo.getGetS3Res().getFileName());
-
-        if(userInfoReq != null){    //null인 경우 메소드 호출시 발생할 수 있는 NullPointerException 방지
-
-            if(userInfoReq.getPhoneNum() != null){
-                phoneNum = userInfoReq.getPhoneNum();
-            }
-            if (userInfoReq.getGender() != null) {
-                gender = userInfoReq.getGender();
-            }
-            if (userInfoReq.getNickname() != null) {
-                nickname = userInfoReq.getNickname();
-            }
-            if (userInfoReq.getBirth() != null) {
-                birth = userInfoReq.getBirth();
-            }
-            if (userInfoReq.getRegion() != null) {
-                region = userInfoReq.getRegion();
-            }
-            if (userInfoReq.getIntroduce() != null) {
-                introduce = userInfoReq.getIntroduce();
-            }
-        }
-
         GetUserInfoRes newUserInfo = new GetUserInfoRes(
                 phoneNum, gender, nickname, birth, region, introduce, getS3Res
         );
