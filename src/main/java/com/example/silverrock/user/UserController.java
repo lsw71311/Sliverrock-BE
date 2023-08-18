@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "https://silver-793a4.web.app", allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
