@@ -219,16 +219,40 @@ public class UserService {
 
         GetUserInfoRes currentUserInfo = getUserInfo(userId);   //기존 유저 정보
 
+        String phoneNum = currentUserInfo.getPhoneNum();
+        String gender = currentUserInfo.getGender();
+        String nickname = currentUserInfo.getNickname();
+        String birth = currentUserInfo.getBirth();
+        String region = currentUserInfo.getRegion();
+        String introduce = currentUserInfo.getIntroduce();
+        GetS3Res getS3Res = new GetS3Res(currentUserInfo.getGetS3Res().getImgUrl(), currentUserInfo.getGetS3Res().getFileName());
+
+        if(userInfoReq != null){    //null인 경우 메소드 호출시 발생할 수 있는 NullPointerException 방지
+
+            if(userInfoReq.getPhoneNum() != null){
+                phoneNum = userInfoReq.getPhoneNum();
+            }
+            if (userInfoReq.getGender() != null) {
+                gender = userInfoReq.getGender();
+            }
+            if (userInfoReq.getNickname() != null) {
+                nickname = userInfoReq.getNickname();
+            }
+            if (userInfoReq.getBirth() != null) {
+                birth = userInfoReq.getBirth();
+            }
+            if (userInfoReq.getRegion() != null) {
+                region = userInfoReq.getRegion();
+            }
+            if (userInfoReq.getIntroduce() != null) {
+                introduce = userInfoReq.getIntroduce();
+            }
+        }
+
         GetUserInfoRes newUserInfo = new GetUserInfoRes(
-                (userInfoReq.getPhoneNum().isEmpty() ? currentUserInfo.getPhoneNum() : userInfoReq.getPhoneNum()),
-                (userInfoReq.getGender().isEmpty() ? currentUserInfo.getGender() : userInfoReq.getGender()),
-                (userInfoReq.getNickname().isEmpty() ? currentUserInfo.getNickname() : userInfoReq.getNickname()),
-                (userInfoReq.getBirth().isEmpty() ? currentUserInfo.getBirth() : userInfoReq.getBirth()),
-                (userInfoReq.getRegion().isEmpty() ? currentUserInfo.getRegion() : userInfoReq.getRegion()),
-                (userInfoReq.getIntroduce().isEmpty() ? currentUserInfo.getIntroduce() : userInfoReq.getIntroduce()),
-                new GetS3Res(currentUserInfo.getGetS3Res().getImgUrl(), currentUserInfo.getGetS3Res().getFileName())
+                phoneNum, gender, nickname, birth, region, introduce, getS3Res
         );
-        //사진은 요청시엔 받지 않고 기존 유저의 사진 그대로 반환
+        //사진은 수정 요청시엔 받지 않고 기존 유저의 사진 그대로 반환
 
         return newUserInfo;
     }

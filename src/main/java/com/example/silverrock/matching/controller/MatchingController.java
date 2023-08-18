@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/matching")
+@CrossOrigin(origins = "https://silver-793a4.web.app", allowCredentials = "true")
 public class MatchingController {
 
     @Autowired
